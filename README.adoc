@@ -16,4 +16,6 @@ In both of them, the application is created out of https://appsody.dev/[appsody]
 
 If you want to create your app using Codewind, have a look at this doc.
 
+[maroon]*Creating the app using Codewind*
+
 include::codewind.adoc[]
