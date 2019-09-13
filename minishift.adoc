@@ -1,6 +1,6 @@
 = SpringBoot - Appsody sample application
 Hemankita Perabathini <Hemankita.Perabathini@ibm.com>
-v1.0, 2019-09-12
+v1.0, 2019-09-13
 :toc:
 :imagesdir: images
 

@@ -1,0 +1,36 @@
+= SpringBoot - Appsody sample application on Codewind
+Hemankita Perabathini <Hemankita.Perabathini@ibm.com>
+v1.0, 2019-09-13
+:toc:
+:imagesdir: images
+
+== Prerequisites
+
+* https://www.eclipse.org/codewind/mdteclipsegettingstarted.html[Codewind for Eclipse]
+* https://appsody.dev/docs/getting-started/installation[appsody]
+
+== Creating the application on Codewind
+
+Our sample is a Springboot application. Let us use Eclipse as our IDE.
+
+Access the codewind explorer as follows.
+
+```
+Window > Show View > Other...
+```
+
+image::show_view.png[align="center"]
+
+It opens a dialog box as follows.
+
+image::codewind.png[align="center"]
+
+Choose `Codewind Explorer` and it will show up in Eclpise.
+
+image::codewind_explorer.png[align="center"]
+
+To create a new project, Right click on the `Projects` > Choose `Create New Project`. You will see something like below.
+
+image::createproject.png[align="center"]
+
+TBD
