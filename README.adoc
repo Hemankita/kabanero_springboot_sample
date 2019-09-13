@@ -303,8 +303,6 @@ image::webhook_settings_access_token_existing.png[align="center"]
 
 - Enter the information for the Pipeline settings
 
-image::pipeline_settings.png[align="center"]
-
 ----
 Namespace - kabanero
 Pipeline - java-spring-boot2-build-deploy-pipeline
@@ -312,13 +310,17 @@ Service account - kabaner-operator
 Docker Registry - docker-registry.default.svc:5000/<your_project>
 ----
 
-- Click Create, a new Gitub webhook is created on the repository.
+image::pipeline_settings.png[align="center"]
+
+- Click Create, a new webhook is created.
 
 image::webhook.png[align="center"]
 
+Also, a new Gitub webhook is created on the project repository.
+
 You can verify it by going into your `github repository > Settings > Webhooks` and you should be able to see the webhook created.
 
-[Issue] The webhook may show an error of 503. It will be cleared the first time the github webhook gets triggered.
+*[Issue]* The webhook may show an error of 503. It will be cleared the first time the github webhook gets triggered.
 
 === Deploy Application
 
