@@ -1,0 +1,486 @@
+= SpringBoot - Appsody sample application
+Hemankita Perabathini <Hemankita.Perabathini@ibm.com>
+v1.0, 2019-09-12
+:toc:
+:imagesdir: images
+
+== Prerequisites
+
+* Minishift
+* Docker for Desktop
+* The following command line (CLI) tools and configured:
+  ** docker
+  ** oc
+  ** git
+  ** appsody
+
+== Setting up the minishift
+
+- Start the minishift as follows.
+
+[source, bash]
+----
+minishift config set cpus 6
+
+minishift config set memory 16GB
+
+minishift start --vm-driver=hyperkit
+----
+
+You will see something like below once started.
+
+[source, bash]
+----
+Login to server ...
+Creating initial project "myproject" ...
+Server Information ...
+OpenShift server started.
+
+The server is accessible via web console at:
+    https://192.168.64.29:8443/console
+
+You are logged in as:
+    User:     developer
+    Password: <any value>
+
+To login as administrator:
+    oc login -u system:admin
+----
+
+- Set it to use `oc` cli.
+
+[source, bash]
+----
+eval $(minishift oc-env)
+----
+
+== Kabanero Foundation Setup on Minishift
+
+To set up `Kabanero Foundation`, follow the below steps.
+
+- Clone the github repo as follows.
+
+[source, bash]
+----
+git clone https://github.com/kabanero-io/kabanero-foundation.git
+----
+
+- Go to the `scripts`.
+
+[source, bash]
+----
+cd kabanero-foundation/scripts
+----
+
+- To install the foundation setup, you need to login as `admin`
+
+[source, bash]
+----
+oc login -u system:admin
+----
+
+If successfully logged in, you will see something like below.
+
+[source, bash]
+----
+$ oc login -u system:admin
+Logged into "https://192.168.64.29:8443" as "system:admin" using existing credentials.
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+    default
+    kube-dns
+    kube-proxy
+    kube-public
+    kube-system
+  * myproject
+    openshift
+    openshift-apiserver
+    openshift-controller-manager
+    openshift-core-operators
+    openshift-infra
+    openshift-node
+    openshift-service-cert-signer
+    openshift-web-console
+
+Using project "myproject".
+----
+
+- Run the below command to install kabanero foundation setup.
+
+[source, bash]
+----
+openshift_master_default_subdomain=<minishift_ip>.nip.io ./install-kabanero-foundation.sh
+----
+
+In the above case, it will be `openshift_master_default_subdomain=192.168.64.29.nip.io ./install-kabanero-foundation.sh`
+
+Once done, you will see something like this at the end.
+
+[source, bash]
+----
++ oc get clusterrole tekton-dashboard-minimal
+NAME                       AGE
+tekton-dashboard-minimal   1s
++ oc patch clusterrole tekton-dashboard-minimal --type json '-p=[{"op":"add","path":"/rules/-","value":{"apiGroups":["security.openshift.io"],"resources":["securitycontextconstraints"],"verbs":["use"]}}]'
+clusterrole.rbac.authorization.k8s.io/tekton-dashboard-minimal patched
++ oc scale -n kabanero deploy tekton-dashboard --replicas=0
+deployment.extensions/tekton-dashboard scaled
++ sleep 5
++ oc scale -n kabanero deploy tekton-dashboard --replicas=1
+deployment.extensions/tekton-dashboard scaled
++ oc patch configmap config-domain --namespace knative-serving --type=json --patch '[{"op": "add", "path": "/data/192.168.64.35.nip.io", "value": ""}]'
+configmap/config-domain patched
++ oc get crd extensions.dashboard.tekton.dev
+NAME                              CREATED AT
+extensions.dashboard.tekton.dev   2019-09-13T18:36:15Z
+----
+
+- Once it is successfully installed, you can run `oc get projects` to see what it installed.
+
+[source, bash]
+----
+$ oc get projects
+NAME                            DISPLAY NAME   STATUS
+istio-system                                   Active
+kabanero                                       Active
+knative-eventing                               Active
+knative-serving                                Active
+knative-sources                                Active
+----
+
+The above are all installed as part of Kabanero foundation setup.
+
+- Let us also create a Persistent Volume for the pipeline to use. A sample hostPath `pv.yaml` is provided.
+
+[source, bash]
+----
+oc apply -f pv.yaml
+----
+
+Once successfully created, you will see something like below.
+
+[source, bash]
+----
+$ oc apply -f pv.yaml
+persistentvolume/appsody-manual-pipeline-run-pvc created
+----
+
+== Add Kabanero Collection to appsody
+
+- Use the appsody CLI to add the Collection repo.
+
+[source, bash]
+----
+appsody repo add kabanero https://github.com/kabanero-io/collections/releases/download/v0.1.2/kabanero-index.yaml
+----
+
+- Set the repo as default.
+
+[source, bash]
+----
+appsody repo set-default kabanero
+----
+
+- List the appsody stacks available in the Collection:
+
+[source, bash]
+----
+appsody list kabanero
+----
+
+It gives you the list of available stacks.
+
+[source, bash]
+----
+$ appsody list kabanero
+
+REPO    	ID               	VERSION  	TEMPLATES        	DESCRIPTION
+kabanero	java-microprofile	0.2.11   	*default         	Eclipse MicroProfile on Open Liberty & OpenJ9 using Maven
+kabanero	java-spring-boot2	0.3.9    	*default, kotlin 	Spring Boot using OpenJ9 and Maven
+kabanero	nodejs           	0.2.5    	*simple          	Runtime for Node.js applications
+kabanero	nodejs-express   	0.2.5    	*simple, skaffold	Express web framework for Node.js
+kabanero	nodejs-loopback  	0.1.4    	*scaffold        	LoopBack 4 API Framework for Node.js
+----
+
+== Create a new Application using appsody
+
+- Create a new directory for the project and change directory into it.
+
+[source, bash]
+----
+mkdir appsody_sample_springboot
+cd appsody_sample_springboot/
+----
+
+- Initialize the project using appsody init and the desired stack ID.
+
+[source, bash]
+----
+appsody init kabanero/java-spring-boot2
+----
+
+- Extract the appsody deployment config.
+
+[source, bash]
+----
+appsody deploy --generate-only
+----
+
+This will generate you the below file.
+
+[source, yaml]
+----
+apiVersion: appsody.dev/v1beta1
+kind: AppsodyApplication
+metadata:
+  name: appsody-sample-springboot
+spec:
+  # Add fields here
+  version: 1.0.0
+  applicationImage: appsody-sample-springboot
+  stack: java-spring-boot2
+  service:
+    type: NodePort
+    port: 8080
+    annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/path: '/actuator/prometheus'
+  readinessProbe:
+    failureThreshold: 12
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 2
+  livenessProbe:
+    failureThreshold: 12
+    httpGet:
+      path: /actuator/liveness
+      port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 2
+  expose: true
+----
+
+By default, the application is deployed in the `kabanero` namespace.
+
+*Note* - For now the applications are deployed to `kabanero` and they only work in this namespace. Deploying to other namespaces is not working at this moment.
+
+== Run the Application using Appsody
+
+- Run the application using appsody
+
+[source, bash]
+----
+appsody run
+----
+
+This step is building a container and running it, the output has the endpoint for the application.
+
+----
+Running development environment...
+Running command: docker[pull kabanero/java-spring-boot2:0.3]
+Running docker command: docker[run --rm -p 5005:5005 -p 8080:8080 -p 35729:35729 --name appsody-sample-springboot-dev -u 501:20 -e APPSODY_USER=501 -e APPSODY_GROUP=20 -v /Users/Hemankita.Perabathini@ibm.com/kabanero101/appsody_sample_springboot/.:/project/user-app -v /Users/Hemankita.Perabathini@ibm.com/.m2/repository:/mvn/repository -v /Users/Hemankita.Perabathini@ibm.com/.appsody/appsody-controller:/appsody/appsody-controller -t --entrypoint /appsody/appsody-controller kabanero/java-spring-boot2:0.3 --mode=run]
+......
+......
+......
+[Container] 2019-09-12 17:49:22.173  INFO 185 --- [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoint(s) beneath base path '/actuator'
+[Container] 2019-09-12 17:49:22.377  INFO 185 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+[Container] 2019-09-12 17:49:22.386  INFO 185 --- [  restartedMain] application.Main                         : Started Main in 7.984 seconds (JVM running for 9.679)
+[Container] 2019-09-12 17:58:42.777  INFO 185 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+[Container] 2019-09-12 17:58:42.777  INFO 185 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+[Container] 2019-09-12 17:58:42.805  INFO 185 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 27 ms
+[Container] 2019-09-12 17:58:43.044  INFO 185 --- [nio-8080-exec-1] i.j.internal.reporters.LoggingReporter   : Span reported: 445d02b19cea491:445d02b19cea491:0:1 - GET
+----
+
+- Open the application using the web browser at http://localhost:8080.
+
+== Stop the Application using Appsody
+
+- To stop the container, run this command.
+
+[source, bash]
+----
+appsody stop
+----
+
+- Alternatively, you can also press `Ctrl+C`.
+
+== Debug the Application using Appsody
+
+To debug the application including reloading the application on code changes run the below command.
+
+[source, bash]
+----
+appsody debug
+----
+
+The output indicates the debug environment is being used
+
+[source, bash]
+----
+$ appsody debug
+Running debug environment
+Running command: docker[pull kabanero/java-spring-boot2:0.3]
+Running docker command: docker[run --rm -p 35729:35729 -p 5005:5005 -p 8080:8080 --name appsody-sample-springboot-dev -u 501:20 -e APPSODY_USER=501 -e APPSODY_GROUP=20 -v /Users/Hemankita.Perabathini@ibm.com/kabanero101/appsody_sample_springboot/.:/project/user-app -v /Users/Hemankita.Perabathini@ibm.com/.m2/repository:/mvn/repository -v /Users/Hemankita.Perabathini@ibm.com/.appsody/appsody-controller:/appsody/appsody-controller -t --entrypoint /appsody/appsody-controller kabanero/java-spring-boot2:0.3 --mode=debug]
+.......
+.......
+.......
+[Container] [INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ application ---
+[Container] [INFO] Changes detected - recompiling the module!
+[Container] [INFO] Compiling 1 source file to /project/user-app/target/test-classes
+[Container] [INFO]
+[Container] [INFO] <<< spring-boot-maven-plugin:2.1.6.RELEASE:run (default-cli) < test-compile @ application <<<
+[Container] [INFO]
+[Container] [INFO]
+[Container] [INFO] --- spring-boot-maven-plugin:2.1.6.RELEASE:run (default-cli) @ application ---
+[Container] [INFO] Attaching agents: []
+[Container] Listening for transport dt_socket at address: 5005
+----
+
+You can make changes to the application for example changing the title in `index.html`. You can access it at `src/main/resources/public/index.html`.
+
+The change will be detected and the application will be restarted inside the running container.
+
+== Push your application to Github
+
+- Setup your git locally with the content of the application.
+
+[source, bash]
+----
+git init
+git add .
+git commit -m "initial commit"
+----
+
+- Create a github repository and push the code to the remote repository.
+
+[source, bash]
+----
+git remote add origin $GITHUB_REPOSITORY_URL
+git push -u origin master
+----
+
+== Configure the DevOps Pipeline
+
+- Access the Tekton dashboard as follows.
+
+Get the route of the tekton dashboard
+
+[source, bash]
+----
+oc get route -n kabanero
+----
+
+You will get all the available routes in the `kabanero` namespace.
+
+[source, bash]
+----
+$ oc get route -n kabanero
+NAME               HOST/PORT                                        PATH      SERVICES           PORT      TERMINATION          WILDCARD
+kabanero-cli       kabanero-cli-kabanero.192.168.64.29.nip.io                 kabanero-cli       <all>     passthrough          None
+kabanero-landing   kabanero-landing-kabanero.192.168.64.29.nip.io             kabanero-landing   <all>     passthrough          None
+tekton-dashboard   tekton-dashboard-kabanero.192.168.64.29.nip.io             tekton-dashboard   <all>     reencrypt/Redirect   None
+----
+
+You can access the tekton pipeline at `tekton-dashboard-kabanero.<minishift_ip>.nip.io`.
+
+In the above case it will be `tekton-dashboard-kabanero.192.168.64.29.nip.io`.
+
+- Use `Login with Openshift` and login as `admin`.
+
+image::tekton_home.png[align="center"]
+
+== Manual Pipeline Setup
+
+- Get the openshift registry info as follows.
+
+[source, bash]
+----
+minishift openshift registry
+----
+
+You will see something like below.
+
+[source, bash]
+----
+$ minishift openshift registry
+172.30.1.1:5000
+----
+
+This will be your <registry_host:port>.
+
+- Go to the below path.
+
+[source, bash]
+----
+cd minishift
+----
+
+- To generate a manual pipeline, run the below command.
+
+[source, bash]
+----
+DOCKER_IMAGE=<registry_host:port>/kabanero/java-spring-boot2 APP_REPO=<github_repo> ./appsody-tekton-example-manual-run.sh
+----
+
+For instance, for the above application, it will be as follows.
+
+```
+DOCKER_IMAGE=172.30.1.1:5000/kabanero/java-spring-boot2 APP_REPO=https://github.com/Hemankita/kabanero_springboot_sample ./appsody-tekton-example-manual-run.sh
+```
+
+Once it is successfully completely, at the end you will see somethinng like below.
+
+[source, bash]
+----
++ cat
++ oc -n kabanero apply -f -
+pipelineresource.tekton.dev/docker-image created
+pipelineresource.tekton.dev/git-source created
++ oc -n kabanero delete pipelinerun manual-pipeline-run
+pipelinerun.tekton.dev "manual-pipeline-run" deleted
++ cat
++ oc -n kabanero apply -f -
+pipelinerun.tekton.dev/manual-pipeline-run created
+----
+
+- Now go to the tekton dashboard at `tekton-dashboard-kabanero.<minishift_ip>.nip.io`.
+
+image::tekton_home.png[align="center"]
+
+- Click on the project pipeline `java-spring-boot2-build-deploy-pipeline`.
+
+image::tekton_manual_pipeline.png[align="center"]
+
+- Wait till the tasks are completed.
+
+image::tekton_manual_pipeline_tasks.png[align="center"]
+
+- When the application is built and deployed the application will be available via the expose `Route`.
+
+- You can get the route from the `oc` CLI.
+
+[source, bash]
+----
+oc get route -n kabanero
+----
+
+For instance,
+
+[source,bash]
+----
+$ oc get route -n kabanero
+NAME                        HOST/PORT                                                 PATH      SERVICES                    PORT      TERMINATION          WILDCARD
+appsody-sample-springboot   appsody-sample-springboot-kabanero.192.168.64.35.nip.io             appsody-sample-springboot   8080                           None
+kabanero-cli                kabanero-cli-kabanero.192.168.64.35.nip.io                          kabanero-cli                <all>     passthrough          None
+kabanero-landing            kabanero-landing-kabanero.192.168.64.35.nip.io                      kabanero-landing            <all>     passthrough          None
+tekton-dashboard            tekton-dashboard-kabanero.192.168.64.35.nip.io                      tekton-dashboard            <all>     reencrypt/Redirect   None
+----
+
+You can now acccess the application at <HOST/PORT>, here it is `appsody-sample-springboot-kabanero.192.168.64.35.nip.io`.
+
+== References
+
+- https://kabanero.io/docs/#scripted-kabanero-foundation-setup.html
