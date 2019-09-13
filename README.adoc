@@ -14,4 +14,6 @@ include::cloudpaks.adoc[]
 
 In both of them, the application is created out of https://appsody.dev/[appsody] cli. Alternatively, you can also create the application using https://www.eclipse.org/codewind/[Codewind] IDE.
 
-If you want to create your app using Codewind, have a look at include::codewind.adoc[]
+If you want to create your app using Codewind, have a look at this doc.
+
+include::codewind.adoc[]
