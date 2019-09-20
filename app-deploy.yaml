@@ -2,12 +2,13 @@ apiVersion: appsody.dev/v1beta1
 kind: AppsodyApplication
 metadata:
   name: appsody-sample-springboot
-  # namespace: kabanero-samples-java
+  namespace: kabanero-samples-java
 spec:
   # Add fields here
   version: 1.0.0
   applicationImage: appsody-sample-springboot
   stack: java-spring-boot2
+  createKnativeService: true
   service:
     type: NodePort
     port: 8080
