@@ -9,12 +9,12 @@ spec:
   applicationImage: appsody-sample-springboot
   stack: java-spring-boot2
   createKnativeService: true
-  service:
-    type: NodePort
-    port: 8080
-    annotations:
-      prometheus.io/scrape: 'true'
-      prometheus.io/path: '/actuator/prometheus'
+  # service:
+  #   type: NodePort
+  #   port: 8080
+  #   annotations:
+  #     prometheus.io/scrape: 'true'
+  #     prometheus.io/path: '/actuator/prometheus'
   readinessProbe:
     failureThreshold: 12
     httpGet:
