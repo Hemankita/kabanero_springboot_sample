@@ -8,6 +8,7 @@ spec:
   version: 1.0.0
   applicationImage: appsody-sample-springboot
   stack: java-spring-boot2
+  # Adding serverless
   createKnativeService: true
   # service:
   #   type: NodePort
