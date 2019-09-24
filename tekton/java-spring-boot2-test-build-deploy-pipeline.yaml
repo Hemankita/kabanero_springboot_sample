@@ -21,7 +21,7 @@ spec:
           resource: docker-image
     - name: build-task
       taskRef:
-        name: CollectionId-build-task
+        name: java-spring-boot2-build-task
       resources:
         inputs:
         - name: git-source
@@ -31,7 +31,7 @@ spec:
           resource: docker-image
     - name: deploy-task
       taskRef:
-        name: CollectionId-deploy-task
+        name: java-spring-boot2-deploy-task
       runAfter: [build-task]
       resources:
         inputs:
