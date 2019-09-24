@@ -1,0 +1,34 @@
+#Kabanero! on activate substitute CollectionId for text 'CollectionId'
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: java-spring-boot2-maven-test-task
+spec:
+  inputs:
+    resources:
+      - name: git-source
+        type: git
+    params:
+      - name: pathToDockerFile
+        default: /workspace/extracted/Dockerfile
+      - name: pathToContext
+        default: /workspace/extracted
+  outputs:
+    resources:
+      - name: docker-image
+        type: image
+  steps:
+    - name: maven-test
+      securityContext:
+        privileged: true
+      image: maven:3-alpine
+      command: ['mvn test']
+      env:
+        - name: gitsource
+          value: git-source
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+  volumes:
+    - name: varlibcontainers
+      emptyDir: {}
