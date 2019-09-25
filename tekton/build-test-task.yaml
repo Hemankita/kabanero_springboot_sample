@@ -35,7 +35,7 @@ spec:
       securityContext:
         privileged: true
       image: ubuntu
-      command: ["/bin/bash","-c","cd extracted && pwd && ls /"]
+      command: ["/bin/bash","-c","cd extracted && pwd && ./mvnw test /"]
       env:
         - name: gitsource
           value: git-source
