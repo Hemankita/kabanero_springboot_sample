@@ -17,10 +17,24 @@ spec:
       - name: docker-image
         type: image
   steps:
-    - name: maven-test
+    - name: assemble-extract
       securityContext:
         privileged: true
       image: appsody/appsody-buildah
+      command: ["/bin/bash"]
+      args:
+        - -c
+        - "/extract.sh"
+      env:
+        - name: gitsource
+          value: git-source
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+    - name: maven-test
+      securityContext:
+        privileged: true
+      image: maven:3-alpine
       command: ['mvn test']
       env:
         - name: gitsource
