@@ -35,7 +35,7 @@ spec:
       securityContext:
         privileged: true
       image: appsody/appsody-buildah
-      command: ["./mvnw test"]
+      command: ["ls"]
       env:
         - name: gitsource
           value: git-source
