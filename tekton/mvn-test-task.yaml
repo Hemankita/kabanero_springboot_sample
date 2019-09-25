@@ -34,8 +34,8 @@ spec:
     - name: maven-test
       securityContext:
         privileged: true
-      image: maven:3-alpine
-      command: ['mvn test']
+      image: appsody/appsody-buildah
+      command: ["mvn test"]
       env:
         - name: gitsource
           value: git-source
