@@ -35,7 +35,7 @@ spec:
       securityContext:
         privileged: true
       image: ubuntu
-      command: ["pwd"]
+      command: ["cd extracted && pwd"]
       env:
         - name: gitsource
           value: git-source
