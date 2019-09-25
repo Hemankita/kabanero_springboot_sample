@@ -35,7 +35,7 @@ spec:
       securityContext:
         privileged: true
       image: ubuntu
-      command: ["cd /workspace/extracted && ../mvnw test"]
+      command: ["pwd"]
       env:
         - name: gitsource
           value: git-source
