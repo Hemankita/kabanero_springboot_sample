@@ -34,8 +34,8 @@ spec:
     - name: maven-test
       securityContext:
         privileged: true
-      image: ubuntu
-      command: ["/bin/bash","-c","cd extracted && pwd && ./mvnw test /"]
+      image: maven:3-alpine
+      command: ["/bin/bash","-c","cd extracted && pwd && mvn test /"]
       env:
         - name: gitsource
           value: git-source
