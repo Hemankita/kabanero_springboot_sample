@@ -31,11 +31,11 @@ spec:
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
-    - name: maven-test
+    - name: appsody-test
       securityContext:
         privileged: true
       image: appsody/appsody-buildah
-      command: ["mvn test"]
+      command: ["appsody test"]
       env:
         - name: gitsource
           value: git-source
