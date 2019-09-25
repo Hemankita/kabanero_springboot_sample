@@ -35,7 +35,7 @@ spec:
       securityContext:
         privileged: true
       image: maven:3-alpine
-      command: ["/bin/bash","-c","cd extracted && pwd && ls && mvn test /"]
+      command: ["/bin/bash","-c","cd extracted/user-app && pwd && ls && mvn test /"]
       env:
         - name: gitsource
           value: git-source
