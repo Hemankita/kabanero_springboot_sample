@@ -32,14 +32,11 @@ spec:
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
-    - name: validate-collection-is-active
+    - name: mvn-test
       securityContext:
         privileged: true
-      image: kabanero/validate-collection
-      command: ["/bin/bash"]
-      args:
-        - -c
-        - "/validate.sh"
+      image: kabanero/java-spring-boot2:0.3
+      command: ["/bin/bash","-c","cd extracted && mvn test -f appsody-boot2-pom.xml"]
       env:
         - name: gitsource
           value: git-source
