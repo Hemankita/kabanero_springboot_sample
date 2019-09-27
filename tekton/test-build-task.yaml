@@ -36,7 +36,7 @@ spec:
       securityContext:
         privileged: true
       image: kabanero/java-spring-boot2:0.3
-      command: ["/bin/bash","-c","cd extracted && mvn test -f appsody-boot2-pom.xml && cd user-app && ls && mvn test"]
+      command: ["/bin/bash","-c","cd extracted && mvn test -f appsody-boot2-pom.xml"]
       env:
         - name: gitsource
           value: git-source
