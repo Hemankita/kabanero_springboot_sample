@@ -23,7 +23,7 @@ spec:
     - name: deploy-task
       taskRef:
         name: java-spring-boot2-deploy-task
-      runAfter: [java-spring-boot2-test-build-task]
+      runAfter: [build-task]
       resources:
         inputs:
         - name: git-source
