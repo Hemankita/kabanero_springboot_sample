@@ -1,3 +1,4 @@
+#Kabanero! on activate substitute CollectionId for text 'CollectionId'
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
@@ -9,7 +10,7 @@ spec:
     - name: docker-image
       type: image
   tasks:
-    - name: java-spring-boot2-test-build-task
+    - name: build-task
       taskRef:
         name: java-spring-boot2-test-build-task
       resources:
