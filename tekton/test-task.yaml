@@ -25,7 +25,7 @@ spec:
         [
           "/bin/bash",
           "-c",
-          "cd ../.. && rm -r /project/user-app && ln -s ${inputs.params.pathToContext} /project/user-app && cd project/user-app/ && ls && $APPSODY_TEST",
+          "pwd",
         ]
       env:
         - name: gitsource
