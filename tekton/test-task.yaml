@@ -25,7 +25,7 @@ spec:
         [
           "/bin/bash",
           "-c",
-          "pwd",
+          "pwd && ls",
         ]
       env:
         - name: gitsource
