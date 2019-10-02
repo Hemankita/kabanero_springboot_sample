@@ -17,6 +17,20 @@ spec:
       - name: docker-image
         type: image
   steps:
+    - name: assemble-extract
+      securityContext:
+        privileged: true
+      image: appsody/appsody-buildah
+      command: ["/bin/bash"]
+      args:
+        - -c
+        - "/extract.sh"
+      env:
+        - name: gitsource
+          value: git-source
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
     - name: test
       securityContext:
         privileged: true
@@ -25,7 +39,7 @@ spec:
         [
           "/bin/bash",
           "-c",
-          "pwd && cd workspace/ && ls",
+          "pwd && ls && cd extracted && pwd && ls",
         ]
       env:
         - name: gitsource
