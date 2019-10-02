@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
-  name: java-spring-boot2-test-build-deploy-pipeline
+  name: java-spring-boot2-hema-test-build-deploy-pipeline
 spec:
   resources:
     - name: git-source
@@ -10,9 +10,20 @@ spec:
     - name: docker-image
       type: image
   tasks:
+    - name: test-task
+      taskRef:
+        name: java-spring-boot2-test-task
+      resources:
+        inputs:
+        - name: git-source
+          resource: git-source
+        outputs:
+        - name: docker-image
+          resource: docker-image
     - name: build-task
       taskRef:
-        name: java-spring-boot2-test-build-task
+        name: java-spring-boot2-build-task
+      runAfter: [test-task]
       resources:
         inputs:
         - name: git-source
