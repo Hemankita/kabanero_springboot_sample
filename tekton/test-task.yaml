@@ -28,7 +28,6 @@ spec:
           "/bin/bash",
           "-c",
           "pwd && ls && cd extracted && pwd && ls",
-          "pwd && ls && cd git-source && pwd && ls && $APPSODY_TEST",
         ]
       env:
         - name: gitsource
