@@ -39,7 +39,7 @@ spec:
         [
           "/bin/bash",
           "-c",
-          "pwd && ls && cd git-source && pwd && ls",
+          "pwd && ls && cd git-source && pwd && ls && mvn test",
         ]
       env:
         - name: gitsource
