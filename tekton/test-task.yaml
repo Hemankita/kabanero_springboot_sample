@@ -27,7 +27,7 @@ spec:
         [
           "/bin/bash",
           "-c",
-          "ln -s /workspace/git-source /workspace/extracted && cd extracted && pwd && ls && $APPSODY_TEST",
+          "ln -s ${inputs.params.pathToGitSource} ${inputs.params.pathToContext} && cd ${inputs.params.pathToContext} && pwd && ls && $APPSODY_TEST",
         ]
       env:
         - name: gitsource
