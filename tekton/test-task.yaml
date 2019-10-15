@@ -12,6 +12,8 @@ spec:
         default: /workspace/extracted
   steps:
     - name: test
+      securityContext:
+        privileged: true
       image: kabanero/java-spring-boot2:0.3
       command:
         [
@@ -19,6 +21,4 @@ spec:
           "-c",
           "ln -s ${inputs.resources.git-source.path} ${inputs.params.pathToContext} && cd ${inputs.params.pathToContext} && pwd && ls && $APPSODY_TEST",
         ]
-      env:
-        - name: gitsource
-          value: git-source
+      
