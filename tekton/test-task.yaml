@@ -14,10 +14,6 @@ spec:
         default: /workspace/extracted
       - name: pathToGitSource
         default: /workspace/git-source
-  outputs:
-    resources:
-      - name: docker-image
-        type: image
   steps:
     - name: test
       securityContext:
