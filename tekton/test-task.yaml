@@ -11,4 +11,4 @@ spec:
     - name: test
       image: kabanero/java-spring-boot2:0.3
       workingdir: ${inputs.resources.git-source.path}
-      command: ["/bin/bash", "-c", "$APPSODY_TEST"]
+      command: ["/bin/bash", "-c", "pwd && ls && $APPSODY_TEST"]
