@@ -8,12 +8,8 @@ spec:
       - name: git-source
         type: git
     params:
-      - name: pathToDockerFile
-        default: /workspace/extracted/Dockerfile
       - name: pathToContext
         default: /workspace/extracted
-      - name: pathToGitSource
-        default: /workspace/git-source
   steps:
     - name: test
       securityContext:
@@ -23,7 +19,7 @@ spec:
         [
           "/bin/bash",
           "-c",
-          "ln -s ${inputs.params.pathToGitSource} ${inputs.params.pathToContext} && cd ${inputs.params.pathToContext} && pwd && ls && $APPSODY_TEST",
+          "ln -s ${inputs.resources.git-source.path} ${inputs.params.pathToContext} && cd ${inputs.params.pathToContext} && pwd && ls && $APPSODY_TEST",
         ]
       env:
         - name: gitsource

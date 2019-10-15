@@ -17,24 +17,24 @@ spec:
         inputs:
         - name: git-source
           resource: git-source
-    - name: build-task
-      taskRef:
-        name: java-spring-boot2-build-task
-      runAfter: [test-task]
-      resources:
-        inputs:
-        - name: git-source
-          resource: git-source
-        outputs:
-        - name: docker-image
-          resource: docker-image
-    - name: deploy-task
-      taskRef:
-        name: java-spring-boot2-deploy-task
-      runAfter: [build-task]
-      resources:
-        inputs:
-        - name: git-source
-          resource: git-source
-        - name: docker-image
-          resource: docker-image
+    # - name: build-task
+    #   taskRef:
+    #     name: java-spring-boot2-build-task
+    #   runAfter: [test-task]
+    #   resources:
+    #     inputs:
+    #     - name: git-source
+    #       resource: git-source
+    #     outputs:
+    #     - name: docker-image
+    #       resource: docker-image
+    # - name: deploy-task
+    #   taskRef:
+    #     name: java-spring-boot2-deploy-task
+    #   runAfter: [build-task]
+    #   resources:
+    #     inputs:
+    #     - name: git-source
+    #       resource: git-source
+    #     - name: docker-image
+    #       resource: docker-image
